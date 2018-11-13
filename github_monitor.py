@@ -61,10 +61,9 @@ def acquire_token_from_web():
     username = input('username: ')
     password = getpass.getpass('password: ')
     response = requests.post(base_url,auth=(username,password),data=json.dumps({'note':'github notifier'}))
-    print(response)
     response = response.json()
-    print(response)
     token = response['token']
+    store_token(token)
     return token
 
 token = acquire_token()
@@ -75,7 +74,7 @@ response = make_request(url,headers)
 old_time = get_time(response)
 
 while(True):
-    time.sleep(300)
+    time.sleep(30)#change for 300
     request = make_request(url,headers)
     new_time = get_time(request)
     if new_time > old_time:
