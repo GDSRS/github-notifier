@@ -21,7 +21,8 @@ def get_time(response):
     return time
 
 def make_request(url,headers=None):
-    response = requests.get(url,headers)
+    response = requests.get(url,headers=headers)
+    #print(response.content)
     return response.json()
 
 def sendmessage(message):
@@ -70,16 +71,21 @@ token = acquire_token()
 headers = {'Authorization': 'token '+token}
 
 url = url+organization_or_user+"/"+repository+"/branches/"+branch
-response = make_request(url,headers)
-old_time = get_time(response)
+try:
+    response = make_request(url,headers)
+    old_time = get_time(response)
 
-while(True):
-    time.sleep(30)#change for 300
-    request = make_request(url,headers)
-    new_time = get_time(request)
-    if new_time > old_time:
-        message = get_commit_info(request)
-        notify(message,new_time)
-        old_time == new_time
-    else:
-        print("sleep " + str(datetime.now()))
+    counter = 0
+    while(True):
+        time.sleep(3)#change for 300
+        request = make_request(url,headers)
+        new_time = get_time(request)
+        if new_time > old_time:
+            message = get_commit_info(request)
+            notify(message,new_time)
+            old_time = new_time
+        else:
+            counter = counter + 1
+            print(str(counter)+" sleep " + str(datetime.now()))
+except KeyError:
+    print('Error ' + response['message'])
